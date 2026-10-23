@@ -4,7 +4,7 @@ Aplicativo gamificado para organizar atividades diárias e criar hábitos. Desen
 
 O usuário distribui suas metas em âmbitos da vida (Saúde, Estudos, Esportes etc.), agenda atividades com lembretes e conclui cada tarefa enviando uma selfie, que é validada por inteligência artificial. Atividades comprovadas geram pontos, moedas e troféus.
 
-**Acesse o aplicativo:** [https://SEU-USUARIO.github.io/lifequest/](https://SEU-USUARIO.github.io/lifequest/)
+**Acesse o aplicativo:** [https://SEU-USUARIO.github.io/lifequest/](https://tglifequest.netlify.app/)
 
 ## Conta de teste
 
@@ -69,8 +69,8 @@ docs/                              monografia e diagramas
 
 ## Equipe
 
-- [Nome do integrante 1]
-- [Nome do integrante 2]
-- [Nome do integrante 3]
+- [Lucas Oliveira de Morais]
+- [Mellissa Wildemann Muniz]
+- [Murilo Litoldo Carneiro]
 
-Orientação: [Prof(a). Nome do(a) orientador(a)]
+Orientação: [Professor Deivison Shindi Takatu]
