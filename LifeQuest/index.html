@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>LifeQuest</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -218,7 +217,7 @@ small{color:var(--ink2)}
 .seg button{flex:1;height:38px;border-radius:11px;font-weight:700;font-size:14px;color:var(--ink2)}
 .seg button.on{background:var(--surface);color:var(--blue-d);box-shadow:0 1px 4px rgba(0,0,0,.08)}
 .troph-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 8px;padding:4px 16px 30px}
-.troph{text-align:center;font-size:12px;font-weight:600;line-height:1.25}
+.troph{text-align:center;font-size:12px;font-weight:600;line-height:1.25;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;align-self:start}
 .troph svg{width:84px;height:84px;display:block;margin:0 auto 4px}
 .post-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:0 16px 30px}
 .pg{aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--c);display:grid;place-items:center;color:#fff}
@@ -258,7 +257,7 @@ small{color:var(--ink2)}
 .post-h{display:flex;align-items:center;gap:10px;padding:12px 14px}
 .post-h .who{flex:1;min-width:0}
 .post-h .who b{display:block;font-size:15px}
-.post-h .who small{font-size:12px}
+.post-h .who small{font-size:12px;display:block}
 .post-media{position:relative}
 .post-media img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover}
 .ph{aspect-ratio:16/10;background:color-mix(in srgb,var(--c) 14%,var(--surface));display:grid;place-items:center;color:var(--c)}
@@ -374,27 +373,6 @@ small{color:var(--ink2)}
 </div></div>
 <input id="camInput" type="file" accept="image/*" capture="user" class="hide" onchange="gotPhoto(this)">
 <script>
-/* ================= conexão com o Supabase ================= */
-const SUPABASE_URL='https://bopulowmqkxagwicunoe.supabase.co';
-const SUPABASE_KEY='sb_publishable_7iObHV59rhg7Y9SVyuzbZw_QV3ZPpv5'; // chave pública: pode ficar no app
-const sb=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
-let AUTH=null;            // {id, email} do usuário logado
-let MYCUSTOM=[];          // âmbitos personalizados do usuário (vindos do banco)
-const RECOVERY=/type=recovery/.test(location.hash);
-function errMsg(e){const m=String((e&&(e.message||e.error_description))||e||'');
- if(/Failed to fetch|NetworkError|Load failed|network/i.test(m))return'Sem conexão com o servidor. Verifique a internet e tente de novo.';
- if(/Email not confirmed/i.test(m))return'Confirme seu e-mail antes de entrar. Procure a mensagem do LifeQuest na sua caixa de entrada.';
- if(/Invalid login credentials/i.test(m))return'E-mail ou senha incorretos.';
- if(/User already registered/i.test(m))return'Já existe uma conta com este e-mail.';
- if(/rate limit|too many/i.test(m))return'Muitas tentativas seguidas. Aguarde alguns minutos e tente de novo.';
- if(/Database error saving new user/i.test(m))return'Não foi possível criar a conta. O nome de usuário pode ter acabado de ser usado; tente outro.';
- if(/should be at least|weak/i.test(m))return'A senha é fraca demais. Use pelo menos 6 caracteres, misturando letras e números.';
- if(/duplicate key/i.test(m))return'Esse dado já está em uso.';
- if(/RN\d+|âmbito|prioridade|Saldo|relatório/i.test(m))return m.replace(/\s*\(RN\d+\)/,'');
- return'Algo deu errado: '+m}
-async function busy(btn,label,fn){const old=btn?btn.innerHTML:'';if(btn){btn.disabled=true;btn.innerHTML=label}try{return await fn()}finally{if(btn&&document.body.contains(btn)){btn.disabled=false;btn.innerHTML=old}}}
-const updMe=f=>sb.from('usuarios').update(f).eq('id',AUTH.id);
-
 /* ================= utilitários ================= */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -504,9 +482,9 @@ function seed(){
  const j=mk({username:'joaopedro',name:'João Pedro',email:'joao@exemplo.com',pass:'-',color:'#EE9B3A'},['organizacao','estudos','higiene'],['estudos']);
  const b=mk({username:'bia_estuda',name:'Beatriz Lima',email:'bia@exemplo.com',pass:'-',color:'#9277DB'},['estudos','auto'],['estudos']);
  const l=mk({username:'lucas.zen',name:'Lucas Moreira',email:'lucas@exemplo.com',pass:'-',color:'#27B3CC'},['auto','saude','esportes'],['auto','saude']);
- m.trophies=[Object.assign(T('ofensiva','Ofensiva: primeira semana','Você usou o LifeQuest por sua primeira semana seguidos, concluindo ao menos uma tarefa por dia.',9),{streak:7}),T('habito','Novo hábito: Esportes','5 atividades de Esportes concluídas.',4)];m.points=m.coins=260;
+ m.trophies=[Object.assign(T('ofensiva','Ofensiva: primeira semana','7 dias seguidos usando o LifeQuest, com pelo menos uma tarefa concluída por dia.',9),{streak:7}),T('habito','Novo hábito: Esportes','5 atividades de Esportes concluídas.',4)];m.points=m.coins=260;
  j.trophies=[T('habito','Novo hábito: Organização diária','5 atividades de Organização diária concluídas.',3)];j.points=j.coins=110;
- b.trophies=[Object.assign(T('ofensiva','Ofensiva: 30 dias','Você usou o LifeQuest por 30 dias seguidos, concluindo ao menos uma tarefa por dia.',6),{streak:30}),T('habito','Novo hábito: Estudos','10 atividades de Estudos concluídas.',2),T('frequencia','Frequência: Revisar flashcards','"Revisar flashcards" concluída 30 vezes.',1)];b.points=b.coins=520;
+ b.trophies=[Object.assign(T('ofensiva','Ofensiva: 30 dias','30 dias seguidos usando o LifeQuest, com pelo menos uma tarefa concluída por dia.',6),{streak:30}),T('habito','Novo hábito: Estudos','10 atividades de Estudos concluídas.',2),T('frequencia','Frequência: Revisar flashcards','"Revisar flashcards" concluída 30 vezes.',1)];b.points=b.coins=520;
  l.points=l.coins=70;
  const fol=(a,bb)=>{a.following.push(bb.username);bb.followers.push(a.username)};
  fol(m,b);fol(b,m);fol(j,m);fol(l,b);fol(b,l);fol(m,l);
@@ -569,14 +547,14 @@ function streakOf(u,endKey){const days=new Set(u.completions.map(useDay));let n=
 function checkTrophies(u,c){const out=[];const done=u.completions;
  const day=useDay(c);const firstOfDay=done.filter(x=>useDay(x)===day).length===1;
  if(firstOfDay){const s=streakOf(u,day);const m=STREAKS.find(x=>x[0]===s);
-  if(m&&!u.trophies.some(t=>t.type==='ofensiva'&&t.streak===m[0]))out.push({type:'ofensiva',streak:m[0],name:`Ofensiva: ${m[1]}`,desc:`Você usou o LifeQuest por ${m[2]} seguidos, concluindo ao menos uma tarefa por dia.`})}
+  if(m&&!u.trophies.some(t=>t.type==='ofensiva'&&t.streak===m[0]))out.push({type:'ofensiva',streak:m[0],name:`Ofensiva: ${m[1]}`,desc:`${m[0]} dias seguidos usando o LifeQuest, com pelo menos uma tarefa concluída por dia.`})}
  const na=done.filter(x=>x.ambitId===c.ambitId).length;
- if(na%5===0)out.push({type:'habito',name:`Novo hábito: ${c.ambitName}`,desc:`${na} atividades de ${c.ambitName} concluídas. Um novo hábito está nascendo.`});
+ if(na%5===0)out.push({type:'habito',name:na===5?`Novo hábito: ${c.ambitName}`:`${c.ambitName}: ${na} atividades`,desc:`${na} atividades de ${c.ambitName} concluídas. Um novo hábito está nascendo.`});
  const key=c.title.trim().toLowerCase();const ns=done.filter(x=>x.title.trim().toLowerCase()===key).length;
  if(ns%30===0)out.push({type:'frequencia',name:`Frequência: ${c.title}`,desc:`Você concluiu "${c.title}" ${ns} vezes. Isso já faz parte de quem você é.`});
  out.forEach(t=>{t.id=uid();t.at=c.at||Date.now();u.trophies.push(t)});return out}
 
-const KEY='lifequest-app-v1';
+const KEY='lifequest-proto-v2';
 let db=null;try{db=JSON.parse(localStorage.getItem(KEY))}catch(e){}
 if(!db||!db.users)db=seed();
 function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){try{db.posts.forEach((p,i)=>{if(i>8)p.photo=null});localStorage.setItem(KEY,JSON.stringify(db))}catch(e2){}}}
@@ -585,13 +563,11 @@ const me=()=>db.users[db.session];
 /* ================= IA (capability sample) ================= */
 /* Fora do Claude: cole aqui o endereço do seu servidor intermediário (ver lifequest-ia-worker.js).
    Ex.: const AI_PROXY_URL='https://lifequest-ia.seu-usuario.workers.dev'; Vazio = validação simulada. */
-const WORKER_URL='https://lifequest-ia.mewmuniz.workers.dev';
-const AI_PROXY_URL=WORKER_URL;
+const AI_PROXY_URL='';
 function blobToB64(b){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=()=>rej(new Error('leitura'));r.readAsDataURL(b)})}
 function proxySample(){
  const call=async(prompt,opts={})=>{const b=opts.images&&opts.images[0];const image=b?{media_type:b.type||'image/jpeg',data:await blobToB64(b)}:null;
-  const ss=sb?(await sb.auth.getSession()).data:null;const tk=ss&&ss.session?ss.session.access_token:'';
-  let r;try{r=await fetch(AI_PROXY_URL,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tk},body:JSON.stringify({prompt,image,tier:opts.modelTier||'default'})})}catch(e){throw{code:'network',message:'Sem conexão com o servidor de IA'}}
+  let r;try{r=await fetch(AI_PROXY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,image,tier:opts.modelTier||'default'})})}catch(e){throw{code:'network',message:'Sem conexão com o servidor de IA'}}
   if(!r.ok)throw{code:r.status===429?'rate_limited':'failed',message:'Servidor de IA respondeu '+r.status};
   const j=await r.json();return{text:String(j.text||''),truncated:false}};
  call.json=async(prompt,opts)=>{const{text}=await call(prompt,opts);const t=text.replace(/```json|```/g,'');const a=t.indexOf('{'),z=t.lastIndexOf('}');if(a<0||z<a)throw{code:'bad_json',message:'Resposta sem JSON'};return JSON.parse(t.slice(a,z+1))};
@@ -602,15 +578,14 @@ function getSample(){if(!samplePromise)samplePromise=((window.claude&&window.cla
 getSample();
 
 /* ================= navegação ================= */
-db.session=null; // a sessão agora vem do login do Supabase
-let R={name:'loading',p:{}};const hist=[];
+let R={name:db.session?'home':'login',p:{}};const hist=[];
 const UI={sel:today(),vm:today().slice(0,7)};
 function go(name,p={},push=true){if(push)hist.push(R);R={name,p};render();const s=$('#screen');if(s)s.scrollTop=0}
 function back(){R=hist.pop()||{name:'home',p:{}};render()}
 function tab(name,p={}){hist.length=0;R={name,p};render();$('#screen').scrollTop=0}
 const TABS=[['home','Início','cal'],['feed','Feed','feed'],['reports','Insights','chart'],['profile','Perfil','user']];
 function render(){
- if(!me()&&!['login','signup','forgot','loading','confirmEmail','newpass'].includes(R.name))R={name:'login',p:{}};
+ if(!me()&&!['login','signup','forgot'].includes(R.name))R={name:'login',p:{}};
  if(me()&&!me().onboarded&&R.name!=='ambits')R={name:'ambits',p:{mode:'onboard'}};
  $('#screen').innerHTML=(S[R.name]||S.home)(R.p);
  const showTabs=TABS.some(t=>t[0]===R.name)&&!(R.name==='profile'&&R.p.user&&R.p.user!==db.session);
@@ -638,44 +613,28 @@ S.login=()=>`<div class="login">
  <div class="login-top"><div class="mark">${hexMark()}</div><h1 class="brand">LifeQuest</h1><p class="tag">Sua rotina vira jornada.</p></div>
  <div class="login-form">
   <label class="field"><span>E-mail</span><input id="le" type="email" autocomplete="email" placeholder="voce@email.com"></label>
-  <label class="field"><span>Senha</span><input id="lp" type="password" autocomplete="current-password" placeholder="Sua senha" onkeydown="if(event.key==='Enter')doLogin($('#lbtn'))"></label>
+  <label class="field"><span>Senha</span><input id="lp" type="password" autocomplete="current-password" placeholder="Sua senha" onkeydown="if(event.key==='Enter')doLogin()"></label>
   <p class="err" id="lerr"></p>
-  <button class="btn primary" id="lbtn" onclick="doLogin(this)">Entrar</button>
+  <button class="btn primary" onclick="doLogin()">Entrar</button>
   <div class="center"><button class="link" onclick="go('forgot')">Esqueci minha senha</button></div>
   <div class="login-alt"><span>Ainda não tem conta?</span><button class="link" onclick="go('signup')">Criar conta</button></div>
+  <div class="center"><button class="link small" onclick="demoLogin()">Entrar com a conta de demonstração</button></div>
  </div></div>`;
-S.loading=()=>`<div class="result" style="padding-top:40vh"><div class="spin"></div><p class="muted">Conectando...</p></div>`;
-async function doLogin(btn){const e=$('#le').value.trim(),p=$('#lp').value;$('#lerr').textContent='';
+function findByEmail(e){e=e.trim().toLowerCase();return Object.values(db.users).find(u=>u.email.toLowerCase()===e)}
+function doLogin(){const e=$('#le').value,p=$('#lp').value;const u=findByEmail(e);
  if(!e||!p){$('#lerr').textContent='Preencha e-mail e senha.';return}
- await busy(btn,'Entrando...',async()=>{const{data,error}=await sb.auth.signInWithPassword({email:e,password:p});
-  if(error){$('#lerr').textContent=errMsg(error);return}
-  await loadSession(data.user)})}
+ if(!u||u.pass!==p){$('#lerr').textContent='E-mail ou senha incorretos.';return}
+ db.session=u.username;save();tab(u.onboarded?'home':'ambits',{mode:'onboard'})}
+function demoLogin(){db.session='lifequester';if(!db.users.lifequester){db=seed();db.session='lifequester'}save();tab('home')}
+
 S.forgot=()=>`<header class="bar"><button class="ib" onclick="back()" aria-label="Voltar">${ic('back',24)}</button><h2>Recuperar senha</h2></header>
  <div class="form"><p class="muted">Informe o e-mail da sua conta. Vamos enviar um link para você criar uma nova senha.</p>
  <label class="field"><span>E-mail</span><input id="fe" type="email" placeholder="voce@email.com"></label>
  <p class="err" id="ferr"></p>
- <button class="btn primary" onclick="doForgot(this)">Enviar link</button></div>`;
-async function doForgot(btn){const e=$('#fe').value.trim();const er=$('#ferr');er.className='err';er.textContent='';
- if(!/^\S+@\S+\.\S+$/.test(e)){er.textContent='Digite um e-mail válido.';return}
- await busy(btn,'Enviando...',async()=>{const{error}=await sb.auth.resetPasswordForEmail(e,{redirectTo:location.origin+location.pathname});
-  if(error){er.textContent=errMsg(error);return}
-  er.className='okmsg';er.textContent=`Se ${e} estiver cadastrado, o link chega em instantes. Confira também o spam.`})}
-S.newpass=()=>`<header class="bar"><h2>Nova senha</h2></header>
- <div class="form"><p class="muted">Crie uma nova senha para a sua conta.</p>
- <label class="field"><span>Nova senha</span><input id="np1" type="password" autocomplete="new-password" placeholder="Mínimo de 6 caracteres"></label>
- <label class="field"><span>Confirmar nova senha</span><input id="np2" type="password" autocomplete="new-password"></label>
- <p class="err" id="nperr"></p><button class="btn primary" onclick="doNewPass(this)">Salvar e entrar</button></div>`;
-async function doNewPass(btn){const a=$('#np1').value,b=$('#np2').value,er=$('#nperr');
- if(a.length<6){er.textContent='A senha precisa ter pelo menos 6 caracteres.';return}
- if(a!==b){er.textContent='As senhas não conferem.';return}
- await busy(btn,'Salvando...',async()=>{const{data,error}=await sb.auth.updateUser({password:a});
-  if(error){er.textContent=errMsg(error);return}
-  history.replaceState(null,'',location.pathname);toast('Senha alterada.');await loadSession(data.user)})}
-S.confirmEmail=p=>`<div class="result" style="padding-top:12vh"><div class="badge-ok">${ic('mail',40)}</div>
- <h2 style="margin-top:16px">Confirme seu e-mail</h2>
- <p class="muted">Enviamos um link para <b>${esc(p.email||'')}</b>. Abra a mensagem e toque no link para ativar a conta; depois é só entrar.</p>
- <p class="muted" style="font-size:13px">Não chegou? Confira o spam ou aguarde alguns minutos.</p>
- <button class="btn primary" onclick="tab('login')">Ir para o login</button></div>`;
+ <button class="btn primary" onclick="doForgot()">Enviar link</button></div>`;
+function doForgot(){const e=$('#fe').value.trim();if(!/^\S+@\S+\.\S+$/.test(e)){$('#ferr').textContent='Digite um e-mail válido.';return}
+ $('#ferr').className='okmsg';$('#ferr').textContent=`Se ${e} estiver cadastrado, o link chega em instantes. Confira também o spam.`}
+
 S.signup=()=>`<header class="bar"><button class="ib" onclick="back()" aria-label="Voltar">${ic('back',24)}</button><h2>Criar conta</h2></header>
  <div class="form">
   <label class="field"><span>Nome completo</span><input id="sn" autocomplete="name" placeholder="Como você se chama"></label>
@@ -685,104 +644,28 @@ S.signup=()=>`<header class="bar"><button class="ib" onclick="back()" aria-label
   <label class="field"><span>Senha</span><input id="sp" type="password" autocomplete="new-password" placeholder="Mínimo de 6 caracteres"></label>
   <label class="field"><span>Confirmar senha</span><input id="sp2" type="password" autocomplete="new-password" placeholder="Repita a senha"></label>
   <p class="err" id="serr"></p>
-  <button class="btn primary" onclick="doSignup(this)">Criar conta</button>
+  <button class="btn primary" onclick="doSignup()">Criar conta</button>
  </div>`;
 const userOk=v=>/^[a-z0-9._]{3,20}$/.test(v);
-let cuT=null;
-function checkUser(v,el='#suh',except=null){v=v.trim().toLowerCase();const h=$(el);if(!h)return;clearTimeout(cuT);
+function checkUser(v,el='#suh',except=null){v=v.trim().toLowerCase();const h=$(el);if(!h)return;
  if(!v){h.style.color='';h.textContent='Letras minúsculas, números, ponto e sublinhado.';return}
  if(!userOk(v)){h.style.color='var(--bad)';h.textContent='Use de 3 a 20 caracteres: a-z, 0-9, ponto ou sublinhado.';return}
- if(v===except){h.style.color='';h.textContent='Esse é o seu nome de usuário atual.';return}
- h.style.color='';h.textContent='Verificando...';
- cuT=setTimeout(async()=>{const{data,error}=await sb.rpc('nome_usuario_disponivel',{p_nome:v});const hh=$(el);if(!hh)return;
-  if(error){hh.style.color='';hh.textContent='Não foi possível verificar agora.';return}
-  hh.style.color=data?'var(--ok)':'var(--bad)';hh.textContent=data?`@${v} está disponível.`:`@${v} já está em uso. Tente outro.`},350)}
-async function doSignup(btn){const n=$('#sn').value.trim(),e=$('#se').value.trim(),b=$('#sb').value,u=$('#su').value.trim().toLowerCase(),p=$('#sp').value,p2=$('#sp2').value;const er=$('#serr');er.textContent='';
+ if(db.users[v]&&v!==except){h.style.color='var(--bad)';h.textContent=`@${v} já está em uso. Tente outro.`;return}
+ h.style.color='var(--ok)';h.textContent=`@${v} está disponível.`}
+function doSignup(){const n=$('#sn').value.trim(),e=$('#se').value.trim(),b=$('#sb').value,u=$('#su').value.trim().toLowerCase(),p=$('#sp').value,p2=$('#sp2').value;const er=$('#serr');
  if(!n||!e||!b||!u||!p||!p2){er.textContent='Preencha todos os campos.';return}
  if(!/^\S+@\S+\.\S+$/.test(e)){er.textContent='Digite um e-mail válido.';return}
+ if(findByEmail(e)){er.textContent='Já existe uma conta com este e-mail.';return}
  if(!userOk(u)){er.textContent='O nome de usuário tem formato inválido.';return}
- if(b>today()){er.textContent='A data de nascimento não pode ser no futuro.';return}
+ if(db.users[u]){er.textContent=`@${u} já está em uso. Escolha outro nome de usuário.`;return}
  if(p.length<6){er.textContent='A senha precisa ter pelo menos 6 caracteres.';return}
  if(p!==p2){er.textContent='As senhas não conferem.';return}
- await busy(btn,'Criando conta...',async()=>{
-  const av=await sb.rpc('nome_usuario_disponivel',{p_nome:u});
-  if(av.error){er.textContent=errMsg(av.error);return}
-  if(!av.data){er.textContent=`@${u} já está em uso. Escolha outro nome de usuário.`;return}
-  const cor=PROFILE_COLORS[Math.floor(Math.random()*PROFILE_COLORS.length)];
-  const{data,error}=await sb.auth.signUp({email:e,password:p,options:{emailRedirectTo:location.origin+location.pathname,
-   data:{nome_usuario:u,nome_completo:n,data_nascimento:b,cor_perfil:cor}}});
-  if(error){er.textContent=errMsg(error);return}
-  if(!data.session){hist.length=0;R={name:'confirmEmail',p:{email:e}};render();return}  // confirmação de e-mail ligada
-  await loadSession(data.user)})}
-
-/* ---- atividades no banco (etapa 3) ---- */
-const REMMIN={'1d':1440,'1h':60,'10m':10},MINREM={1440:'1d',60:'1h',10:'10m'};
-const toRow=a=>({ambito_id:a.ambitId,titulo:a.title,data_inicio:a.date,hora_inicio:fmtT(a.sh,a.sm),hora_fim:a.hasEnd?fmtT(a.eh,a.em):null,frequencia:a.repeat?a.freq:null});
-function fromAtiv(r){const[sh,sm]=r.hora_inicio.split(':').map(Number);const f=r.hora_fim?r.hora_fim.split(':').map(Number):null;
- return{id:r.id,ambitId:r.ambito_id,title:r.titulo,date:r.data_inicio,sh,sm,hasEnd:!!f,eh:f?f[0]:(sh+1)%24,em:f?f[1]:0,
-  repeat:!!r.frequencia,freq:r.frequencia||'diaria',rem:(r.atividade_lembretes||[]).map(l=>MINREM[l.antecedencia_min]).filter(Boolean),created:Date.parse(r.criado_em)||Date.now()}}
-async function dbSaveAct(a,id){let actId=id;
- if(id){const{error}=await sb.from('atividades').update(toRow(a)).eq('id',id);if(error)throw error;
-  const d=await sb.from('atividade_lembretes').delete().eq('atividade_id',id);if(d.error)throw d.error}
- else{const{data,error}=await sb.from('atividades').insert({...toRow(a),usuario_id:AUTH.id}).select('id').single();if(error)throw error;actId=data.id}
- if(a.rem.length){const{error}=await sb.from('atividade_lembretes').insert(a.rem.map(r=>({atividade_id:actId,antecedencia_min:REMMIN[r]})));if(error)throw error}
- return actId}
-function dbExec(a,k,campos){ // inicia ou adia uma ocorrência (RLS só permite estados não concluídos)
- return sb.from('execucoes').upsert({usuario_id:AUTH.id,atividade_id:a.id,ambito_id:a.ambitId,titulo:a.title,data_ocorrencia:k,...campos},{onConflict:'atividade_id,data_ocorrencia'})
-  .then(({error})=>{if(error)toast('Não foi possível sincronizar: '+errMsg(error))})}
-async function loadActivities(u){
- const{data,error}=await sb.from('atividades').select('*, atividade_lembretes(antecedencia_min)').eq('usuario_id',AUTH.id);if(error)throw error;
- let list=data.map(fromAtiv);
- if(!u.actsMigrated&&!list.length&&u.activities.length){ // envia uma vez as atividades criadas antes da etapa 3
-  const ids={};for(const a of u.activities){if(!ambById(a.ambitId)||!u.ambits.find(x=>x.id===a.ambitId))continue;try{ids[a.id]=await dbSaveAct(a)}catch(e){}}
-  u.completions.forEach(c=>{if(ids[c.actId])c.actId=ids[c.actId]});
-  const again=await sb.from('atividades').select('*, atividade_lembretes(antecedencia_min)').eq('usuario_id',AUTH.id);if(!again.error)list=again.data.map(fromAtiv)}
- u.actsMigrated=true;u.activities=list;
- const ex=await sb.from('execucoes').select('atividade_id,data_ocorrencia,status,iniciada_em,adiada_ate').eq('usuario_id',AUTH.id).neq('status','concluida');
- if(ex.error)throw ex.error;const now=Date.now();
- const run=ex.data.filter(e=>e.status==='em_andamento'&&e.iniciada_em&&!doneOf(u,e.atividade_id,e.data_ocorrencia)).sort((a,b)=>Date.parse(b.iniciada_em)-Date.parse(a.iniciada_em))[0];
- u.running=run?{actId:run.atividade_id,date:run.data_ocorrencia,startedAt:Date.parse(run.iniciada_em)}:null;
- u.snoozes=ex.data.filter(e=>e.adiada_ate&&Date.parse(e.adiada_ate)>now).map(e=>({actId:e.atividade_id,date:e.data_ocorrencia,at:Date.parse(e.adiada_ate)}))}
-
-async function loadGame(u){
- const[pf,ex,tr]=await Promise.all([
-  sb.from('usuarios').select('pontos,moedas').eq('id',AUTH.id).single(),
-  sb.from('execucoes').select('id,atividade_id,data_ocorrencia,titulo,ambito_id,concluida_em,pontos,duracao_min').eq('usuario_id',AUTH.id).eq('status','concluida'),
-  sb.from('trofeus').select('id,tipo,nome,descricao,marco,conquistado_em').eq('usuario_id',AUTH.id)]);
- for(const r of[pf,ex,tr])if(r.error)throw r.error;
- u.points=pf.data.pontos;u.coins=pf.data.moedas;
- u.completions=ex.data.map(e=>({id:e.id,actId:e.atividade_id,date:e.data_ocorrencia,at:Date.parse(e.concluida_em),title:e.titulo,ambitId:e.ambito_id,ambitName:(ambById(e.ambito_id)||{}).name||'',points:e.pontos,minutes:e.duracao_min||30}));
- u.trophies=tr.data.map(fromTrofeu).sort((a,b)=>a.at-b.at)}
-
-/* ---- sessão: carrega o perfil e os âmbitos do banco ---- */
-const ORDEM_PADRAO=['Saúde','Estudos','Autodesenvolvimento','Esportes','Lazer','Higiene','Organização diária'];
-const fromRow=r=>({id:r.id,name:r.nome,desc:r.descricao,color:r.cor,icon:r.icone||'star'});
-function ambById(id){return CAT.find(a=>a.id===id)||MYCUSTOM.find(a=>a.id===id)}
-async function loadCatalog(){const{data,error}=await sb.from('ambitos').select('id,nome,descricao,cor,icone,criado_por');if(error)throw error;
- const pad=data.filter(r=>!r.criado_por).sort((a,b)=>ORDEM_PADRAO.indexOf(a.nome)-ORDEM_PADRAO.indexOf(b.nome)).map(fromRow);
- CAT.splice(0,CAT.length,...pad);MYCUSTOM=data.filter(r=>r.criado_por===AUTH.id).map(fromRow)}
-async function loadSession(user){
- try{AUTH={id:user.id,email:user.email};await loadCatalog();
-  const{data:p,error}=await sb.from('usuarios').select('*').eq('id',user.id).single();if(error)throw error;
-  const{data:ua,error:e2}=await sb.from('usuario_ambitos').select('ambito_id,prioritario').eq('usuario_id',user.id);if(e2)throw e2;
-  let u=Object.values(db.users).find(x=>x.id===user.id);
-  if(u){for(const k in db.users)if(db.users[k]===u)delete db.users[k]}else{u=newUser({username:p.nome_usuario});u.id=user.id}
-  delete db.users[p.nome_usuario]; // um usuário de exemplo com o mesmo @ dá lugar à conta real
-  Object.assign(u,{id:user.id,username:p.nome_usuario,name:p.nome_completo,birth:p.data_nascimento,color:p.cor_perfil,showName:p.mostrar_nome,email:user.email});
-  u.ambits=(ua||[]).map(r=>{const a=ambById(r.ambito_id);return a?{...a,priority:r.prioritario}:null}).filter(Boolean);
-  u.onboarded=u.ambits.length>0;db.users[u.username]=u;db.session=u.username;await loadGame(u);await loadActivities(u);save();
-  hist.length=0;AMB=null;R=RECOVERY_PENDING?{name:'newpass',p:{}}:{name:u.onboarded?'home':'ambits',p:{mode:'onboard'}};RECOVERY_PENDING=false;render()}
- catch(e){AUTH=null;db.session=null;R={name:'login',p:{}};render();setTimeout(()=>{const l=$('#lerr');if(l)l.textContent='Não foi possível carregar sua conta. '+errMsg(e)},0)}}
-let RECOVERY_PENDING=RECOVERY;
-async function boot(){
- if(!sb){R={name:'login',p:{}};render();$('#lerr').textContent='Não foi possível carregar a conexão com o servidor. Verifique a internet e recarregue a página.';return}
- sb.auth.onAuthStateChange((ev)=>{if(ev==='PASSWORD_RECOVERY'){RECOVERY_PENDING=true;if(me()){RECOVERY_PENDING=false;R={name:'newpass',p:{}};render()}}});
- const{data}=await sb.auth.getSession();
- if(data&&data.session)await loadSession(data.session.user);else{R={name:'login',p:{}};render()}}
+ const nu=newUser({username:u,name:n,email:e,pass:p,birth:b,color:PROFILE_COLORS[Math.floor(Math.random()*PROFILE_COLORS.length)]});
+ db.users[u]=nu;db.session=u;save();hist.length=0;R={name:'ambits',p:{mode:'onboard'}};AMB=null;render()}
 
 /* ---- âmbitos ---- */
 let AMB=null;
-function ambInit(){const u=me();AMB={sel:{},custom:MYCUSTOM.map(a=>({...a}))};u.ambits.forEach(a=>AMB.sel[a.id]={priority:!!a.priority})}
+function ambInit(){const u=me();AMB={sel:{},custom:u.ambits.filter(a=>!CAT.find(c=>c.id===a.id)).map(a=>({...a}))};u.ambits.forEach(a=>AMB.sel[a.id]={priority:!!a.priority})}
 function maxPrio(n){return n>=3?2:n===2?1:0}
 S.ambits=p=>{const u=me();if(!AMB)ambInit();
  const all=[...CAT,...AMB.custom];const n=Object.keys(AMB.sel).length;const np=Object.values(AMB.sel).filter(x=>x.priority).length;const mp=maxPrio(n);
@@ -800,7 +683,7 @@ S.ambits=p=>{const u=me();if(!AMB)ambInit();
  <div class="amb-list">${all.map(row).join('')}
   <div class="amb-row" style="--c:var(--blue)"><button style="display:flex;align-items:center;gap:14px;flex:1;text-align:left" onclick="customSheet()"><span class="circ dash">${ic('plus',26)}</span><span class="tx"><b>Criar âmbito</b><small>Algo que não está na lista? Dê um nome e uma cor.</small></span></button></div>
  </div>
- <div class="amb-foot"><p class="prio-note">${note}</p><button class="btn primary" ${n?'':'disabled'} onclick="ambConfirm('${p.mode||''}',this)">Confirmar âmbitos</button></div>`};
+ <div class="amb-foot"><p class="prio-note">${note}</p><button class="btn primary" ${n?'':'disabled'} onclick="ambConfirm('${p.mode||''}')">Confirmar âmbitos</button></div>`};
 function ambToggle(id){const u=me();
  if(AMB.sel[id]){if(u.activities.some(a=>a.ambitId===id)){toast('Este âmbito tem atividades. Exclua-as antes de removê-lo.');return}delete AMB.sel[id]}
  else AMB.sel[id]={priority:false};
@@ -812,16 +695,7 @@ function ambPrio(id){const s=AMB.sel[id];if(s&&s.priority){s.priority=false;keep
  if(np>=mp){toast(mp===0?'Selecione pelo menos dois âmbitos para ter uma prioridade.':mp===1?'Com dois âmbitos, só um pode ser prioridade.':'Você pode ter até duas prioridades.');return}
  AMB.sel[id]={priority:true};keepScroll(render)}
 function keepScroll(fn){const s=$('#screen').scrollTop;fn();$('#screen').scrollTop=s}
-async function ambConfirm(mode,btn){
- const ok=await busy(btn,'Salvando...',async()=>{try{
-  for(const a of AMB.custom){if(String(a.id).startsWith('c_')&&AMB.sel[a.id]){
-   const{data,error}=await sb.from('ambitos').insert({nome:a.name,descricao:a.desc,cor:a.color,icone:'star',criado_por:AUTH.id}).select('id').single();
-   if(error)throw error;const old=a.id;a.id=data.id;AMB.sel[a.id]=AMB.sel[old];delete AMB.sel[old];MYCUSTOM.push({...a})}}
-  const itens=Object.entries(AMB.sel).filter(([id])=>!String(id).startsWith('c_')).map(([id,v])=>({ambito_id:id,prioritario:!!v.priority}));
-  const{error}=await sb.rpc('salvar_ambitos',{p_itens:itens});if(error)throw error;return true}
-  catch(e){toast(errMsg(e));return false}});
- if(!ok)return;
- const u=me();const all=[...CAT,...AMB.custom];
+function ambConfirm(mode){const u=me();const all=[...CAT,...AMB.custom];
  u.ambits=all.filter(a=>AMB.sel[a.id]).map(a=>({id:a.id,name:a.name,desc:a.desc,color:a.color,icon:a.icon,priority:AMB.sel[a.id].priority}));
  const first=!u.onboarded;u.onboarded=true;AMB=null;save();
  if(first){tab('profile');toast('Tudo pronto! Este é o seu perfil.')}else{back();toast('Âmbitos atualizados.')}}
@@ -878,17 +752,15 @@ S.newact=p=>{const u=me();const a=p.prefill||{};const nh=(new Date().getHours()+
   <div class="field"><span>Lembrar-me</span><div class="chips">${Object.entries(REM).map(([k,l])=>`<label class="chk-chip"><input type="checkbox" id="na-r${k}" ${v.rem.includes(k)?'checked':''}><span>${l}</span></label>`).join('')}</div>
    <small class="hint">Escolha quantos quiser, ou nenhum. No horário de início você sempre recebe uma notificação.</small></div>
   <p class="err" id="na-err"></p>
-  <button class="btn primary" onclick="saveAct(this)">Salvar atividade</button>
+  <button class="btn primary" onclick="saveAct()">Salvar atividade</button>
  </div>`};
-async function saveAct(btn){const u=me();const p=R.p;const g=id=>$(id);
+function saveAct(){const u=me();const p=R.p;const g=id=>$(id);
  const a={ambitId:g('#na-amb').value,title:g('#na-title').value.trim(),date:g('#na-date').value,sh:+g('#na-sh').value,sm:+g('#na-sm').value,hasEnd:g('#na-hasend').checked,eh:+g('#na-eh').value,em:+g('#na-em').value,repeat:g('#na-rep').checked,freq:g('#na-freq').value,rem:Object.keys(REM).filter(k=>g('#na-r'+k).checked)};
  if(!a.title){g('#na-err').textContent='Dê um nome para a atividade.';return}
  if(!a.date){g('#na-err').textContent='Escolha a data.';return}
  if(a.hasEnd&&a.eh*60+a.em===a.sh*60+a.sm){g('#na-err').textContent='O término precisa ser diferente do início.';return}
- let newId;const ok=await busy(btn,'Salvando...',async()=>{try{newId=await dbSaveAct(a,p.editId);return true}catch(e){g('#na-err').textContent=errMsg(e);return false}});
- if(!ok)return;
  if(p.editId){Object.assign(u.activities.find(x=>x.id===p.editId),a);save();back();toast('Atividade atualizada.');return}
- const act=mkAct({...a,id:newId});u.activities.push(act);
+ const act=mkAct(a);u.activities.push(act);
  if(p.sugg){const rep=u.reports.find(r=>r.id===p.sugg.rid);if(rep)rep.data.ai.atividades[p.sugg.i].status='aceita';}
  save();UI.sel=a.date;UI.vm=a.date.slice(0,7);
  if(p.sugg){back();toast('Sugestão adicionada ao calendário.')}else{tab('home');toast('Atividade salva.')}}
@@ -918,10 +790,8 @@ S.activity=p=>{const u=me();const a=u.activities.find(x=>x.id===p.id);if(!a)retu
  </div>`};
 function isRunning(u,id,k){return u.running&&u.running.actId===id&&u.running.date===k}
 function startActivity(id,k){const u=me();u.running={actId:id,date:k,startedAt:Date.now()};save();NQ=null;
- const a=u.activities.find(x=>x.id===id);if(a)dbExec(a,k,{status:'em_andamento',iniciada_em:new Date().toISOString()});
  if(R.name==='activity')render();else renderNotif();toast('Atividade iniciada.')}
-function delAct(id){confirmBox('Excluir atividade?','Ela some do calendário, inclusive das próximas repetições. O histórico de conclusões e troféus é mantido.','Excluir',async()=>{const{error}=await sb.from('atividades').delete().eq('id',id);if(error){toast(errMsg(error));return}
- const u=me();u.activities=u.activities.filter(a=>a.id!==id);if(u.running&&u.running.actId===id)u.running=null;save();back();toast('Atividade excluída.')})}
+function delAct(id){confirmBox('Excluir atividade?','Ela some do calendário, inclusive das próximas repetições. O histórico de conclusões e troféus é mantido.','Excluir',()=>{const u=me();u.activities=u.activities.filter(a=>a.id!==id);if(u.running&&u.running.actId===id)u.running=null;save();back();toast('Atividade excluída.')})}
 function clockState(u,a,k){const done=doneOf(u,a.id,k);if(done)return{t:'Feito!',l:'Atividade concluída',cls:'done',pr:1};
  const run=isRunning(u,a.id,k)?u.running:null;
  if(!run)return{t:a.hasEnd?fmtDur(durMin(a)*6e4):'00:00:00',l:'Não iniciada',cls:'',pr:0};
@@ -946,8 +816,7 @@ function renderNotif(){const el=$('#notif');const u=me();if(!u){el.innerHTML='';
   <div class="ntf-a"><button onclick="snooze('${n.a.id}','${n.k}')">Adiar 10 min</button><button class="p" onclick="startActivity('${n.a.id}','${n.k}')">Iniciar</button></div></div>`;
  else el.innerHTML=`<div class="ntf">${head}<div class="ntf-b" ${open} style="display:flex;align-items:center;justify-content:space-between;gap:10px"><div><b>${esc(n.a.title)}</b><span>${n.a.hasEnd?'Até o fim da atividade':'Em andamento'}</span></div><span class="ntf-clock" id="nclock"></span></div></div>`;
  updateClocks()}
-function snooze(id,k){const u=me();const at=Date.now()+6e5;u.snoozes.push({actId:id,date:k,at});save();
- const a=u.activities.find(x=>x.id===id);if(a)dbExec(a,k,{adiada_ate:new Date(at).toISOString()});NQ=null;renderNotif();toast('Combinado. Avisamos de novo em 10 minutos.')}
+function snooze(id,k){const u=me();u.snoozes.push({actId:id,date:k,at:Date.now()+6e5});save();NQ=null;renderNotif();toast('Combinado. Avisamos de novo em 10 minutos.')}
 function demoNotif(id,k){const u=me();const a=u.activities.find(x=>x.id===id);notify({kind:'start',a,k})}
 function checkSchedule(){const u=me();if(!u||!u.onboarded)return;const now=Date.now();const t=today();
  for(const k of [t,addDays(t,1)])for(const a of activitiesOn(u,k)){if(doneOf(u,a.id,k))continue;const st=startTs(a,k);
@@ -984,23 +853,10 @@ S.proofPreview=p=>`<header class="bar"><button class="ib" onclick="back()" aria-
   <div class="btns"><button class="btn primary" onclick="sendProof()">Enviar para aprovação</button><button class="btn ghost" onclick="pickPhoto()">${ic('cam',20)}Tirar outra foto</button></div></div>`;
 async function sendProof(){if(!PHOTO)return;const u=me();const {id,date}=R.p;const share=$('#shareChk').checked;const a=u.activities.find(x=>x.id===id);const am=ambOf(u,a.ambitId);
  R={name:'proofCheck',p:{id,date}};render();
- let res;try{res=await workerPost('/validar',{atividade_id:id,data:date,foto:await blobToB64(PHOTO.blob)})}catch(e){res={err:true,motivo:e.message}}
+ let res;try{res=await aiValidate(a,am,PHOTO.blob)}catch(e){res={err:true,motivo:e&&e.code==='rate_limited'?'Muitas análises seguidas. Aguarde um minuto e envie de novo.':'Não conseguimos analisar a foto agora. Tente enviar de novo.'}}
  if(R.name!=='proofCheck'||R.p.id!==id)return;
- if(res.aprovado){const out=applyConclusao(u,a,am,date,res,share);R={name:'proofDone',p:{...out,motivo:res.motivo}};render()}
+ if(res.aprovado){const out=completeAct(u,a,am,date,share);R={name:'proofDone',p:{...out,motivo:res.motivo,sim:res.simulado}};render()}
  else{R={name:'proofFail',p:{id,date,motivo:res.motivo,err:res.err}};render()}}
-async function workerPost(path,body){const{data}=await sb.auth.getSession();const tk=data&&data.session&&data.session.access_token;
- if(!tk)throw new Error('Sua sessão expirou. Entre novamente.');
- let r;try{r=await fetch(WORKER_URL+path,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tk},body:JSON.stringify(body)})}
- catch(e){throw new Error('Sem conexão com o servidor de validação. Verifique a internet.')}
- const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||('O servidor respondeu com erro '+r.status+'.'));return j}
-const fromTrofeu=t=>({id:t.id,type:t.tipo==='novo_habito'?'habito':t.tipo,name:t.nome,desc:t.descricao,at:Date.parse(t.conquistado_em)||Date.now(),streak:t.tipo==='ofensiva'?t.marco:undefined});
-function applyConclusao(u,a,am,k,res,share){const ex=res.execucao||{};
- const c={id:ex.id||uid(),actId:a.id,date:k,at:Date.parse(ex.concluida_em)||Date.now(),title:a.title,ambitId:am.id,ambitName:am.name,points:res.pontos,minutes:ex.duracao_min||30};
- u.completions.push(c);if(res.saldo){u.points=res.saldo.pontos;u.coins=res.saldo.moedas}
- if(isRunning(u,a.id,k))u.running=null;
- const tro=(res.trofeus||[]).map(fromTrofeu);u.trophies.push(...tro);TQ=tro.slice();
- if(share)addPost({type:'activity',title:a.title,ambitId:am.id,ambitName:am.name,color:am.color,icon:am.icon,photo:res.foto_url||PHOTO.dataUrl,points:res.pontos});
- save();return{pts:res.pontos,title:a.title,color:am.color}}
 async function aiValidate(a,am,blob){const sim={aprovado:true,simulado:true,motivo:'Validação simulada: a IA não está configurada neste ambiente.'};
  const s=await getSample();if(!s){await sleep(2200);return sim}
  const lim=await s.limits().catch(()=>null);if(!lim||!lim.images){await sleep(1600);return sim}
@@ -1077,62 +933,52 @@ function delPost(id){confirmBox('Excluir publicação?','Ela sai do feed e do se
 S.settings=()=>{const u=me();return`<header class="bar"><button class="ib" onclick="back()" aria-label="Voltar">${ic('back',24)}</button><h2>Configurações</h2></header>
  <div class="set-group"><h4>Perfil</h4>
   <div class="set-pad"><label class="field" style="margin:6px 0 0"><span>Nome de usuário</span><span class="at-wrap" style="display:block;margin:0"><input id="xu" value="${esc(u.username)}" autocapitalize="none" maxlength="20" oninput="checkUser(this.value,'#xuh','${u.username}')"></span><small class="hint" id="xuh"></small></label>
-  <button class="btn ghost" style="height:42px;margin-top:10px" onclick="changeUser(this)">Salvar nome de usuário</button></div>
+  <button class="btn ghost" style="height:42px;margin-top:10px" onclick="changeUser()">Salvar nome de usuário</button></div>
   <div class="set-item" style="border-top:1px solid var(--line)">${ic('palette',20)}<div class="grow"><b>Cor do ícone do perfil</b></div>${avatar(u,34)}</div>
-  <div class="swatches">${PROFILE_COLORS.map(c=>`<button class="sw ${c===u.color?'on':''}" style="--c:${c}" aria-label="Usar esta cor" onclick="setColor('${c}')"></button>`).join('')}</div>
-  <div class="set-item">${ic('eye',20)}<div class="grow"><b>Mostrar meu nome real</b><small>${u.name?esc(u.name)+' aparece abaixo do @':'Você não informou um nome'}</small></div>${sw('xn',u.showName,"setShowName(this)")}</div>
+  <div class="swatches">${PROFILE_COLORS.map(c=>`<button class="sw ${c===u.color?'on':''}" style="--c:${c}" aria-label="Usar esta cor" onclick="me().color='${c}';save();keepScroll(render)"></button>`).join('')}</div>
+  <div class="set-item">${ic('eye',20)}<div class="grow"><b>Mostrar meu nome real</b><small>${u.name?esc(u.name)+' aparece abaixo do @':'Você não informou um nome'}</small></div>${sw('xn',u.showName,"me().showName=this.checked;save()")}</div>
  </div>
  <div class="set-group"><h4>Conta</h4>
   <button class="set-item" onclick="pwSheet()">${ic('lock',20)}<div class="grow"><b>Alterar senha</b></div>${ic('chev',18)}</button>
   <button class="set-item" onclick="supportSheet()">${ic('mail',20)}<div class="grow"><b>Contatar o suporte</b><small>Dúvidas, problemas ou sugestões</small></div>${ic('chev',18)}</button>
-  <button class="set-item" onclick="logout(this)">${ic('logout',20)}<div class="grow"><b>Sair da conta</b></div></button>
+  <button class="set-item" onclick="logout()">${ic('logout',20)}<div class="grow"><b>Sair da conta</b></div></button>
   <button class="set-item" style="color:var(--bad)" onclick="delAccount()">${ic('trash',20)}<div class="grow"><b>Excluir conta</b><small>Apaga seus dados, troféus e publicações</small></div></button>
  </div>
-<div style="height:20px"></div>`};
-async function changeUser(btn){const u=me();const n=$('#xu').value.trim().toLowerCase();const hh=$('#xuh');
- if(n===u.username){hh.style.color='';hh.textContent='Esse já é o seu nome de usuário.';return}
- if(!userOk(n)){hh.style.color='var(--bad)';hh.textContent='Use de 3 a 20 caracteres: a-z, 0-9, ponto ou sublinhado.';return}
- await busy(btn,'Salvando...',async()=>{const{error}=await updMe({nome_usuario:n});
-  if(error){hh.style.color='var(--bad)';hh.textContent=/duplicate/i.test(error.message)?`@${n} já está em uso. Tente outro.`:errMsg(error);return}
-  const old=u.username;delete db.users[n];u.username=n;delete db.users[old];db.users[n]=u;
-  Object.values(db.users).forEach(x=>{x.following=x.following.map(y=>y===old?n:y);x.followers=x.followers.map(y=>y===old?n:y);x.events.forEach(e=>{if(e.who===old)e.who=n})});
-  db.posts.forEach(p=>{if(p.user===old)p.user=n;p.likes=p.likes.map(y=>y===old?n:y);p.hearts=p.hearts.map(y=>y===old?n:y)});
-  db.session=n;save();render();toast(`Agora você é @${n}.`)})}
-async function setColor(c){const u=me();const old=u.color;u.color=c;keepScroll(render);
- const{error}=await updMe({cor_perfil:c});if(error){u.color=old;keepScroll(render);toast(errMsg(error));return}save()}
-async function setShowName(el){const u=me();const v=el.checked;const{error}=await updMe({mostrar_nome:v});
- if(error){el.checked=!v;toast(errMsg(error));return}u.showName=v;save()}
+ <div class="set-group"><h4>Apresentação do protótipo</h4>
+  <button class="set-item" onclick="me().coins+=500;save();toast('500 moedas adicionadas.')">${ic('coin',20)}<div class="grow"><b>Adicionar 500 moedas</b><small>Para testar a compra de relatórios</small></div></button>
+  <button class="set-item" onclick="resetProto()">${ic('spark',20)}<div class="grow"><b>Restaurar dados de exemplo</b><small>Apaga tudo e recria os usuários de demonstração</small></div></button>
+ </div><div style="height:20px"></div>`};
+function changeUser(){const u=me();const n=$('#xu').value.trim().toLowerCase();const h=$('#xuh');
+ if(n===u.username){h.textContent='Esse já é o seu nome de usuário.';return}
+ if(!userOk(n)){h.style.color='var(--bad)';h.textContent='Use de 3 a 20 caracteres: a-z, 0-9, ponto ou sublinhado.';return}
+ if(db.users[n]){h.style.color='var(--bad)';h.textContent=`@${n} já está em uso. Tente outro.`;return}
+ const old=u.username;u.username=n;delete db.users[old];db.users[n]=u;
+ Object.values(db.users).forEach(x=>{x.following=x.following.map(y=>y===old?n:y);x.followers=x.followers.map(y=>y===old?n:y);x.events.forEach(e=>{if(e.who===old)e.who=n})});
+ db.posts.forEach(p=>{if(p.user===old)p.user=n;p.likes=p.likes.map(y=>y===old?n:y);p.hearts=p.hearts.map(y=>y===old?n:y)});
+ db.session=n;save();render();toast(`Agora você é @${n}.`)}
 function pwSheet(){openModal(`<div class="scrim" onclick="closeModal()"></div><div class="sheet" role="dialog" aria-label="Alterar senha"><h3>Alterar senha</h3><p>Use pelo menos 6 caracteres.</p>
  <label class="field"><span>Senha atual</span><input id="p0" type="password" autocomplete="current-password"></label>
  <label class="field"><span>Nova senha</span><input id="p1" type="password" autocomplete="new-password"></label>
  <label class="field"><span>Confirmar nova senha</span><input id="p2" type="password" autocomplete="new-password"></label>
- <p class="err" id="perr"></p><button class="btn primary" onclick="changePw(this)">Salvar nova senha</button></div>`)}
-async function changePw(btn){const e=$('#perr');const p0=$('#p0').value,p1=$('#p1').value,p2=$('#p2').value;
- if(p1.length<6){e.textContent='A nova senha precisa ter pelo menos 6 caracteres.';return}
- if(p1!==p2){e.textContent='As senhas não conferem.';return}
- await busy(btn,'Salvando...',async()=>{const chk=await sb.auth.signInWithPassword({email:AUTH.email,password:p0});
-  if(chk.error){e.textContent='A senha atual está incorreta.';return}
-  const{error}=await sb.auth.updateUser({password:p1});if(error){e.textContent=errMsg(error);return}
-  closeModal();toast('Senha alterada.')})}
+ <p class="err" id="perr"></p><button class="btn primary" onclick="changePw()">Salvar nova senha</button></div>`)}
+function changePw(){const u=me();const e=$('#perr');if($('#p0').value!==u.pass){e.textContent='A senha atual está incorreta.';return}
+ if($('#p1').value.length<6){e.textContent='A nova senha precisa ter pelo menos 6 caracteres.';return}
+ if($('#p1').value!==$('#p2').value){e.textContent='As senhas não conferem.';return}
+ u.pass=$('#p1').value;save();closeModal();toast('Senha alterada.')}
 function supportSheet(){openModal(`<div class="scrim" onclick="closeModal()"></div><div class="sheet" role="dialog" aria-label="Contatar o suporte"><h3>Fale com o suporte</h3><p>Respondemos em até 2 dias úteis no e-mail ${esc(me().email)}.</p>
  <label class="field"><span>Assunto</span><select id="ss"><option>Dúvida sobre o app</option><option>Problema na validação de foto</option><option>Pontos ou troféus</option><option>Sugestão</option><option>Outro</option></select></label>
  <label class="field"><span>Mensagem</span><textarea id="sm" placeholder="Conte o que aconteceu"></textarea></label>
- <p class="err" id="serr2"></p><button class="btn primary" onclick="sendSupport(this)">Enviar mensagem</button></div>`)}
-async function sendSupport(btn){const m=$('#sm').value.trim();if(!m){$('#serr2').textContent='Escreva sua mensagem.';return}
- await busy(btn,'Enviando...',async()=>{const{error}=await sb.from('mensagens_suporte').insert({usuario_id:AUTH.id,email:AUTH.email,assunto:$('#ss').value,mensagem:m});
-  if(error){$('#serr2').textContent=errMsg(error);return}closeModal();toast('Mensagem enviada ao suporte.')})}
-async function logout(btn){await busy(btn,'Saindo...',async()=>{await sb.auth.signOut()});AUTH=null;db.session=null;save();NQ=null;tab('login')}
+ <p class="err" id="serr2"></p><button class="btn primary" onclick="if(!$('#sm').value.trim()){$('#serr2').textContent='Escreva sua mensagem.';return}closeModal();toast('Mensagem enviada ao suporte.')">Enviar mensagem</button></div>`)}
+function logout(){db.session=null;save();NQ=null;tab('login')}
 function delAccount(){const u=me();openModal(`<div class="scrim" onclick="closeModal()"></div><div class="sheet" role="dialog" aria-label="Excluir conta"><h3>Excluir sua conta?</h3>
  <p>Isso apaga permanentemente suas atividades, pontos, troféus e publicações. Para confirmar, digite <b>${esc(u.username)}</b>.</p>
  <label class="field"><span>Nome de usuário</span><input id="dc" autocapitalize="none"></label><p class="err" id="derr"></p>
- <div class="btns"><button class="btn danger" onclick="doDelete(this)">Excluir conta</button><button class="btn ghost" onclick="closeModal()">Cancelar</button></div></div>`)}
-async function doDelete(btn){const u=me();if($('#dc').value.trim().toLowerCase()!==u.username){$('#derr').textContent='O nome digitado não confere.';return}
- const ok=await busy(btn,'Excluindo...',async()=>{const{error}=await sb.rpc('excluir_minha_conta');if(error){$('#derr').textContent=errMsg(error);return false}return true});
- if(!ok)return;await sb.auth.signOut().catch(()=>{});
+ <div class="btns"><button class="btn danger" onclick="doDelete()">Excluir conta</button><button class="btn ghost" onclick="closeModal()">Cancelar</button></div></div>`)}
+function doDelete(){const u=me();if($('#dc').value.trim().toLowerCase()!==u.username){$('#derr').textContent='O nome digitado não confere.';return}
  const n=u.username;delete db.users[n];db.posts=db.posts.filter(p=>p.user!==n);
  Object.values(db.users).forEach(x=>{x.following=x.following.filter(y=>y!==n);x.followers=x.followers.filter(y=>y!==n)});
  db.posts.forEach(p=>{p.likes=p.likes.filter(y=>y!==n);p.hearts=p.hearts.filter(y=>y!==n)});
- AUTH=null;db.session=null;save();closeModal();tab('login');toast('Conta excluída.')}
+ db.session=null;save();closeModal();tab('login');toast('Conta excluída.')}
 function resetProto(){confirmBox('Restaurar dados de exemplo?','Todas as contas criadas neste aparelho serão apagadas.','Restaurar',()=>{db=seed();db.session='lifequester';save();tab('home');toast('Dados de exemplo restaurados.')})}
 
 /* ---- feed ---- */
@@ -1143,7 +989,6 @@ function addPost(o){const u=me();const p=Object.assign({id:uid(),user:u.username
   if(post&&owner&&who&&!post[kind].includes(who)){post[kind].push(who);owner.events.push({kind:kind==='likes'?'like':'heart',dir:'in',who,at:Date.now()});save();if(R.name==='feed')keepScroll(render)}},5000)}
 S.feed=()=>{const v=me();const q=UI.q||'';return`<header class="bar"><h2>Feed</h2>${coinChip(v)}</header>
  <div class="search" role="search">${ic('search',19)}<input id="fq" type="search" placeholder="Buscar usuários" aria-label="Buscar usuários" autocomplete="off" autocapitalize="none" value="${esc(q)}" oninput="feedSearch(this.value)"><button class="clr ${q?'':'hide'}" id="fclr" onclick="feedSearch('');$('#fq').value='';$('#fq').focus()" aria-label="Limpar busca">${ic('x',16)}</button></div>
- <p class="muted" style="margin:-6px 18px 12px;font-size:12.5px">Feed de exemplo: as publicações reais chegam na etapa 5 da integração.</p>
  <div id="fres" class="ures ${q.trim()?'':'hide'}">${userResults(q)}</div>
  <div id="fposts" class="feed ${q.trim()?'hide':''}">${db.posts.filter(p=>db.users[p.user]).map(p=>postHTML(p,v)).join('')||'<div class="empty">Nenhuma publicação ainda.</div>'}</div>`};
 function userResults(q){const v=me();q=q.trim().toLowerCase().replace(/^@/,'');if(!q)return'';
@@ -1159,7 +1004,7 @@ function postHTML(p,v){const u=db.users[p.user];const self=u.username===v.userna
  let media='',cap='';
  if(p.type==='activity'){media=p.photo?`<div class="post-media"><img src="${p.photo}" alt="Foto de comprovação de ${esc(p.title)}" loading="lazy"></div>`:`<div class="ph" style="--c:${p.color}"><span class="big">${ic(p.icon,44)}</span></div>`;
   cap=`Concluiu <b>${esc(p.title)}</b><span class="chip" style="--c:${p.color}">${esc(p.ambitName)}</span>`}
- if(p.type==='trophy'){media=`<div class="trophy-media" style="--c:${TROPHY[p.trophy.type].c1}">${trophySVG(p.trophy.type,'')}</div>`;cap=`Conquistou o <b>${esc(p.trophy.name)}</b>. ${esc(p.trophy.desc)}`}
+ if(p.type==='trophy'){media=`<div class="trophy-media" style="--c:${TROPHY[p.trophy.type].c1}">${trophySVG(p.trophy.type,'')}</div>`;cap=`Conquistou o troféu <b>${esc(p.trophy.name)}</b>. ${esc(p.trophy.desc)}`}
  if(p.type==='report'){media=`<div class="rep-media"><h3>${esc(p.report.label)}</h3><div class="rs">${p.report.stats.map(([a,b])=>`<div><b>${esc(a)}</b><span>${esc(b)}</span></div>`).join('')}</div></div>`;cap='Compartilhou sua retrospectiva.'}
  const lk=p.likes.includes(v.username),ht=p.hearts.includes(v.username);
  return`<article class="post"><div class="post-h"><button onclick="openProfile('${u.username}')" aria-label="Ver perfil de @${esc(u.username)}">${avatar(u,40)}</button>
@@ -1182,7 +1027,7 @@ const REPORTS=[
  {id:'detalhado',name:'Mensal detalhado com IA',desc:'Tudo do mensal, mais 5 atividades sugeridas pela IA para aceitar, recusar ou editar, e ideias de hábitos, exercícios e hobbies.'}
 ];
 S.reports=()=>{const u=me();return`<header class="bar"><h2>Insights</h2></header>
- <div class="wallet"><div><small>Suas moedas</small><b>${ic('coin',30)}${u.coins}</b></div><small style="text-align:right;max-width:150px">Cada atividade validada rende 10 moedas, ou 20 em âmbitos prioritários.</small></div>
+ <div class="wallet"><div><small>Suas moedas</small><b><span style="color:var(--gold);display:flex">${ic('coin',30)}</span>${u.coins}</b></div><small style="text-align:right;max-width:150px">Cada atividade validada rende 10 moedas, ou 20 em âmbitos prioritários.</small></div>
  <p class="muted" style="margin:0 20px 12px;font-size:13.5px">Cada relatório retrata um período, por isso fica disponível por 3 dias após a compra.</p>
  ${REPORTS.map(r=>{const pr=PRICE[r.id];const ok=u.coins>=pr;const act=u.reports.filter(x=>x.type===r.id&&repActive(x)).pop();
   return`<div class="rep-card"><div class="top"><h3>${r.name}</h3><span class="price">${ic('coin',18)}${pr}</span></div><p>${r.desc}</p>
@@ -1191,9 +1036,8 @@ S.reports=()=>{const u=me();return`<header class="bar"><h2>Insights</h2></header
  ${u.reports.length?`<div class="hist"><h3 style="margin:10px 4px 4px">Seus relatórios</h3>${u.reports.slice().reverse().map(r=>{const on=repActive(r);return`<button onclick="go('report',{id:'${r.id}'})" ${on?'':'style="opacity:.55"'}>${REPORTS.find(x=>x.id===r.type).name}<span>${on?`até ${fmtExp(r)}`:'expirado'}</span></button>`}).join('')}</div>`:''}`};
 function fmtExp(r){const d=new Date(repExp(r));return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' às '+fmtT(d.getHours(),d.getMinutes())}
 function buyReport(type){const u=me();const pr=PRICE[type];const r=REPORTS.find(x=>x.id===type);
- confirmBox(`Desbloquear ${r.name.toLowerCase()}?`,`Serão descontadas ${pr} moedas e você fica com ${u.coins-pr}. O relatório fica disponível por 3 dias; depois disso, uma nova compra gera a versão do novo período.`,'Desbloquear',async()=>{
-  const{data:rid,error}=await sb.rpc('comprar_meu_relatorio',{p_tipo:type});if(error){toast(errMsg(error));return}
-  u.coins-=pr;const now=Date.now();const gen={semanal:weekly,raiox:raiox,ranking:ranking}[type]||monthly;const rep={id:rid||uid(),type,at:now,expires:now+VALID_MS,shared:false,data:gen(u)};
+ confirmBox(`Desbloquear ${r.name.toLowerCase()}?`,`Serão descontadas ${pr} moedas e você fica com ${u.coins-pr}. O relatório fica disponível por 3 dias; depois disso, uma nova compra gera a versão do novo período.`,'Desbloquear',()=>{
+  u.coins-=pr;const now=Date.now();const gen={semanal:weekly,raiox:raiox,ranking:ranking}[type]||monthly;const rep={id:uid(),type,at:now,expires:now+VALID_MS,shared:false,data:gen(u)};
   if(type==='detalhado')rep.data.ai={loading:true};u.reports.push(rep);save();go('report',{id:rep.id});if(type==='detalhado')genSuggestions(u,rep)})}
 const hrsFmt=h=>(Math.round(h*10)/10).toLocaleString('pt-BR')+' h';
 function weekly(u){const end=today(),start=addDays(end,-6);const cs=u.completions.filter(c=>c.date>=start&&c.date<=end);
@@ -1268,10 +1112,9 @@ function aiBlock(u,r){const ai=r.data.ai;if(ai.loading)return`<div class="panel 
  <div class="panel"><h3>Novos hábitos para experimentar</h3><ul class="ul">${ai.habitos.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
  <div class="panel"><h3>Exercícios</h3><ul class="ul">${ai.exercicios.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
  <div class="panel"><h3>Hobbies</h3><ul class="ul">${ai.hobbies.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`}
-async function sugAct(rid,i,act){const u=me();const r=u.reports.find(x=>x.id===rid);const s=r.data.ai.atividades[i];
+function sugAct(rid,i,act){const u=me();const r=u.reports.find(x=>x.id===rid);const s=r.data.ai.atividades[i];
  if(act==='no'){s.status='recusada';save();keepScroll(render);return}
- if(act==='ok'){const {status,motivo,...a}=s;let id;try{id=await dbSaveAct(a)}catch(e){toast(errMsg(e));return}
-  u.activities.push(mkAct({...a,id}));s.status='aceita';save();keepScroll(render);toast('Adicionada ao calendário.');return}
+ if(act==='ok'){const {status,motivo,...a}=s;u.activities.push(mkAct(a));s.status='aceita';save();keepScroll(render);toast('Adicionada ao calendário.');return}
  const {status,motivo,...a}=s;go('newact',{prefill:a,sugg:{rid,i}})}
 const IDEAS={
  saude:[['Beber um copo de água ao acordar',7,10,0,0,'diaria',['10m']],['Caminhada leve',12,30,12,50,'diaria',['10m']],['Check-up anual',9,0,10,0,'anual',['1d','1h']]],
@@ -1314,7 +1157,7 @@ function confirmBox(t,txt,ok,fn){CB=fn;openModal(`<div class="scrim" onclick="cl
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#modal').classList.contains('open'))closeModal()});
 
 /* ---- inicialização ---- */
-render();boot();
+render();
 setInterval(updateClocks,1000);
 setInterval(checkSchedule,5000);checkSchedule();
 </script>
